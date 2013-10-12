@@ -3,7 +3,7 @@ var express = require('express'),
 	uglifyJS = require("uglify-js"),
 	sqwish = require('sqwish'),
 	htmlminifier = require('html-minifier');
-	db = require('./db.js');
+	db = require('./db');
 
 var app = express();
 app.use(express.logger());
@@ -14,7 +14,12 @@ app.use(express.compress());
 var port = process.env.PORT || 8000;
 
 function start() {
-	//set up dynamic routing
+	//homepage
+	app.get('/',
+		function(req,res) {
+		});
+	
+	//set up dynamic routing for requesting apis
 	app.get("/*",
 		function (req,res) {
 			//set up server response here
@@ -27,4 +32,4 @@ function start() {
 		});
 }
 
-export start = start
+exports.start = start
