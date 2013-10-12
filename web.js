@@ -24,9 +24,9 @@ function start() {
 	
 	//Use the env port when specified
 	var port = process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 8000;
-	
+	var ip = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
 	//start the web server
-	app.listen(port,
+	app.listen(port,ip,
 		function () {
 			console.log('Listening on port ' + port);
 		});
