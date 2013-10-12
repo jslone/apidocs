@@ -9,10 +9,6 @@ var app = express();
 app.use(express.logger());
 app.use(express.compress());
 
-
-//Use the env port when specified
-var port = process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 8000;
-
 function start() {
 	//homepage
 	app.get('/',
@@ -24,6 +20,10 @@ function start() {
 		function (req,res) {
 			//set up server response here
 		});
+	
+	
+	//Use the env port when specified
+	var port = process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 8000;
 	
 	//start the web server
 	app.listen(port,
