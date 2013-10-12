@@ -11,7 +11,7 @@ app.use(express.compress());
 
 
 //Use the env port when specified
-var port = process.env.PORT || 8000;
+var port = process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 8000;
 
 function start() {
 	//homepage
