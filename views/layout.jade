@@ -5,12 +5,16 @@ html
 		link(rel='stylesheet' href='css/style.css')
 	body
 		header
-			a(href='/') APIDocs
-			input(type='text' name='search')
-			input(type='button' onclick='search();')
+			logo
+				h1
+					a(href='/') APIDocs
+			search-container
+				input(type='text' name='search')
+				input(type='button' onclick='search();')
 		.container
-			.nav-menu
-			.main-content
+			nav-menu
+			main-content
 				block content
 		footer
-			p APIDocs https://github.com/jslone/apidocs
+			.container
+				p APIDocs https://github.com/jslone/apidocs

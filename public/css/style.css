@@ -1,0 +1,10 @@
+@import url("http://fonts.googleapis.com/css?family=Open+Sans:400,800");
+body{font-family:'Arial';background-color:#fff;color:#000;margin:0}
+a:link,a:visited,a:hover,a:active{color:inherit;text-decoration:none}
+header{font-family:'Open Sans';width:100%;background-color:#000;color:#fff;overflow:hidden}
+logo{margin-left:2em;float:left}
+search-container{margin-top:2em;margin-right:2em;float:right}
+nav-menu{background-color:#909090}
+main-content{margin-left:200px}
+footer{position:absolute;bottom:0;width:100%;background-color:#909090;color:#000}
+.container{max-width:1000px;margin-left:auto;margin-right:auto}

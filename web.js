@@ -21,7 +21,7 @@ function compile(str, path) {
 app.use(stylus.middleware(
 	{
 		src: __dirname + '/style',
-		dest: __dirname + '/public/css',
+		dest: __dirname + '/public',
 		compile: compile
 	}
 	  ));
