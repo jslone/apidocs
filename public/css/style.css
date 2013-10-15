@@ -4,7 +4,8 @@ a:link,a:visited,a:hover,a:active{color:inherit;text-decoration:none}
 header{font-family:'Open Sans';width:100%;background-color:#000;color:#fff;overflow:hidden}
 logo{margin-left:2em;float:left}
 search-container{margin-top:2em;margin-right:2em;float:right}
-nav-menu{background-color:#909090}
+nav-menu{background-color:#d8d8d8}
 main-content{margin-left:200px}
-footer{position:absolute;bottom:0;width:100%;background-color:#909090;color:#000}
+footer{position:absolute;bottom:0;width:100%;background-color:#d8d8d8;color:#000}
 .container{max-width:1000px;margin-left:auto;margin-right:auto}
+.unit{background-color:#d8d8d8;color:#000;-webkit-border-radius:5px;border-radius:5px;padding:2em;padding-top:1px}
