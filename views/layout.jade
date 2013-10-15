@@ -1,0 +1,16 @@
+!!!5
+html
+	head
+		title #{title}
+		link(rel='stylesheet' href='css/style.css')
+	body
+		header
+			a(href='/') APIDocs
+			input(type='text' name='search')
+			input(type='button' onclick='search();')
+		.container
+			.nav-menu
+			.main-content
+				block content
+		footer
+			p APIDocs https://github.com/jslone/apidocs
