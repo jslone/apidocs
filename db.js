@@ -12,19 +12,19 @@ mongo.Db.connect(mongoUri, function (err, db) {
 	mongoDB = db;
 });
 
-function get(name,path,callback) {
+function get(params,callback) {
 	var api = mongoDB.collection('api');
-	api.findOne({fullName : path + '/' +  name},
-		function(err,res) {
+	api.find(params).toArray(
+		function(err,items) {
 			if(err)
 				console.log(err);
-			callback(res);
+			callback(items);
 		});
 }
 
-function put(obj,callback) {
+function put(items,callback) {
 	var api = mongoDB.collection('api');
-	api.insert(obj,{w:1},
+	api.insert(items,{w:1},
 		function(err,res) {
 			if(err)
 				console.log(err);
