@@ -1,4 +1,4 @@
 apidocs
 =======
 
-APIDocs - A web project aimed at providing organized API documentation.
+APIDocs - A web project which will generate and host organized API documentation.
