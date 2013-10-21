@@ -14,17 +14,15 @@ function purge(attr,purgeChildren) {
 
 function APIElem(name,path,type,version,children,attr) {
 	this.name = name;
-	this.fullName = path + '/' + name;
+	this.path = path;
+	this.fullName = name + path;
 	this.type = type;
-	this.version = version;
 	this.children = children;
 	this.attr = attr;
-	this.purge = purge;
 }
 
 function loadChildren(item) {
 	if(item.children) {
-		//finish this up, loadChildren from db and replace names with APIElem
 	}
 }
 
