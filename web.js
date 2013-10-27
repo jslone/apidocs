@@ -8,6 +8,7 @@ var app = express();
 
 app.use(express.logger());
 app.use(express.compress());
+app.use(express.bodyParser());
 
 //extend compile function for stylus to use nib
 function compile(str, path) {
@@ -44,10 +45,62 @@ function start() {
 				{title : 'APIDocs'});
 		});
 	
+	app.post('/login',
+		function(req,res) {
+		});
+	
 	//set up dynamic routing for requesting apis
 	app.get("/api/*",
 		function (req,res) {
-			//set up server response here
+			var apiFullName = req.url.substring(5,req.url.length);
+			var apis = db.get('api',{fullName : apiFullName});
+			if(apis.length > 0) {
+				var api = apis[0];
+				res.render('api',api);
+			}
+			//404
+			else {
+				res.render('404',
+					{title : 'APIDocs - 404'});
+			}
+		});
+
+	app.post('/api/*',
+		function(req,res) {
+			api = req.body;
+			if(typeof api == undefined ||
+				typeof api.name == undefined ||
+				typeof api.path == undefined ||
+				typeof api.type == undefined ||
+				typeof api.children == undefined) {
+				
+				console.log('Invalid PUT request ' + req);
+			}
+			else {
+				db.put('api',api);
+			}
+		});
+
+	app.put('/api/*',
+		function(req,res) {
+			api = req.body;
+			if(typeof api == undefined ||
+				typeof api.name == undefined ||
+				typeof api.path == undefined ||
+				typeof api.type == undefined ||
+				typeof api.children == undefined) {
+				
+				console.log('Invalid PUT request ' + req);
+			}
+			else {
+				db.update('api',api);
+			}
+		});
+
+	app.del('/api/*',
+		function(req,res) {
+			var apiFullName = req.url.substring(5,req.url.length);
+			db.del({fullName : apiFullName});
 		});
 	
 	

@@ -14,7 +14,7 @@ mongo.Db.connect(mongoUri, function (err, db) {
 
 function get(col,params) {
 	var api = mongoDB.collection(col);
-	return api.find(param);
+	return api.find(params);
 }
 
 function put(col,items,callback) {
@@ -35,7 +35,7 @@ function update(col,items,callback) {
 		});
 }
 
-function remove(col,items,callback) {
+function del(col,items,callback) {
 	var api = mongoDB.collection(col);
 	api.insert(items,{w:1},
 		function(err,res) {
@@ -47,4 +47,4 @@ function remove(col,items,callback) {
 exports.get = get
 exports.put = put
 exports.update = update
-exports.remove = remove
+exports.del = del
