@@ -1,6 +1,6 @@
 var mongo = require('mongodb');
 
-var mongoUri = 'mongodb://$OPENSHIFT_MONGODB_DB_HOST:$OPENSHIFT_MONGODB_DB_PORT'
+var mongoUri = 'mongodb://admin:E3W9bKIybng5@$OPENSHIFT_MONGODB_DB_HOST:$OPENSHIFT_MONGODB_DB_PORT/apidocs'
 			|| 'mongodb://localhost/test';
 
 var mongoDB;
