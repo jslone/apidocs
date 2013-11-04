@@ -2,7 +2,7 @@ var mongo = require('mongodb');
 
 var mongoUri = process.env.MONGOLAB_URI
 			|| process.env.MONGOHQ_URL
-			|| 'mongodb://localhost/mydb';
+			|| 'mongodb://localhost/test';
 
 var mongoDB;
 
@@ -12,9 +12,9 @@ mongo.Db.connect(mongoUri, function (err, db) {
 	mongoDB = db;
 });
 
-function get(col,params) {
-	var api = mongoDB.collection(col);
-	return api.find(params);
+function get(col,params,callback) {
+	var collection = mongoDB.collection(col);
+	return collection.find(params).toArray(callback);
 }
 
 function put(col,items,callback) {

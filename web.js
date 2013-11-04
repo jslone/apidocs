@@ -53,16 +53,20 @@ function start() {
 	app.get("/api/*",
 		function (req,res) {
 			var apiFullName = req.url.substring(5,req.url.length);
-			var apis = db.get('api',{fullName : apiFullName});
-			if(apis.length > 0) {
-				var api = apis[0];
-				res.render('api',api);
-			}
-			//404
-			else {
-				res.render('404',
-					{title : 'APIDocs - 404'});
-			}
+			console.log(apiFullName);
+			
+			db.get('api',{fullName : apiFullName},
+				function(err,results) {
+					console.log(results);
+					if(results.length > 0) {
+						res.render('api',{'api' : results[0]});
+					}
+					//404
+					else {
+						res.render('404',
+							{title : 'APIDocs - 404'});
+					}
+				});
 		});
 
 	app.post('/api/*',
@@ -72,7 +76,8 @@ function start() {
 				typeof api.name == undefined ||
 				typeof api.path == undefined ||
 				typeof api.type == undefined ||
-				typeof api.children == undefined) {
+				typeof api.children == undefined ||
+				typeof api.attr == undefined) {
 				
 				console.log('Invalid PUT request ' + req);
 			}
@@ -88,7 +93,8 @@ function start() {
 				typeof api.name == undefined ||
 				typeof api.path == undefined ||
 				typeof api.type == undefined ||
-				typeof api.children == undefined) {
+				typeof api.children == undefined ||
+				typeof api.attr == undefined) {
 				
 				console.log('Invalid PUT request ' + req);
 			}
