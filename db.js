@@ -1,7 +1,6 @@
 var mongo = require('mongodb');
 
-var mongoUri = process.env.MONGOLAB_URI
-			|| process.env.MONGOHQ_URL
+var mongoUri = 'mongodb://$OPENSHIFT_MONGODB_DB_HOST:$OPENSHIFT_MONGODB_DB_PORT'
 			|| 'mongodb://localhost/test';
 
 var mongoDB;
