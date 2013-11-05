@@ -52,7 +52,7 @@ function start() {
 	//set up dynamic routing for requesting apis
 	app.get("/api/*",
 		function (req,res) {
-			var apiFullName = req.url.substring(5,req.url.length);
+			var apiFullName = req.url.substring(4,req.url.length);
 			console.log(apiFullName);
 			
 			db.get('api',{fullName : apiFullName},
