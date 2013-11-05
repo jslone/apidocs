@@ -1,10 +1,11 @@
 var mongo = require('mongodb');
 
-var mongoUri = 'mongodb://admin:E3W9bKIybng5@'
+var mongoUri = (process.env.OPENSHIFT_MONGODB_DB_HOST ?
+			'mongodb://admin:E3W9bKIybng5@'
 			+ process.env.OPENSHIFT_MONGODB_DB_HOST
 			+ ':' + process.env.OPENSHIFT_MONGODB_DB_PORT
 			+ '/apidocs'
-			|| 'mongodb://localhost/test';
+			: 'mongodb://localhost/test');
 
 var mongoDB;
 

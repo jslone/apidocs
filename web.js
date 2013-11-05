@@ -82,6 +82,9 @@ function start() {
 				console.log('Invalid PUT request ' + req);
 			}
 			else {
+				if(!api.fullName) {
+					api.fullName = api.path + '/' + api.name;
+				}
 				db.put('api',api);
 			}
 		});
@@ -99,6 +102,9 @@ function start() {
 				console.log('Invalid PUT request ' + req);
 			}
 			else {
+				if(!api.fullName) {
+					api.fullName = api.path + '/' + api.name;
+				}
 				db.update('api',api);
 			}
 		});
