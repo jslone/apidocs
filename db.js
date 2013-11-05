@@ -1,6 +1,9 @@
 var mongo = require('mongodb');
 
-var mongoUri = 'mongodb://admin:E3W9bKIybng5@$OPENSHIFT_MONGODB_DB_HOST:$OPENSHIFT_MONGODB_DB_PORT/apidocs'
+var mongoUri = 'mongodb://admin:E3W9bKIybng5@'
+			+ process.env.OPENSHIFT_MONGODB_DB_HOST
+			+ ':' + process.env.OPENSHIFT_MONGODB_DB_PORT
+			+ '/apidocs'
 			|| 'mongodb://localhost/test';
 
 var mongoDB;
@@ -13,7 +16,7 @@ mongo.Db.connect(mongoUri, function (err, db) {
 
 function get(col,params,callback) {
 	var collection = mongoDB.collection(col);
-	return collection.find(params).toArray(callback);
+	collection.find(params).toArray(callback);
 }
 
 function put(col,items,callback) {
