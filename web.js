@@ -36,7 +36,6 @@ app.set('view engine', 'jade');
 //	disk io
 app.use(express.static(__dirname + '/public'));
 
-
 function start() {
 	//homepage
 	app.get('/',
@@ -72,19 +71,23 @@ function start() {
 	app.post('/api/*',
 		function(req,res) {
 			api = req.body;
-			if(typeof api == undefined ||
-				typeof api.name == undefined ||
-				typeof api.path == undefined ||
-				typeof api.type == undefined ||
-				typeof api.children == undefined ||
-				typeof api.attr == undefined) {
-				
-				console.log('Invalid PUT request ' + req);
+			if(typeof api == 'undefined' ||
+				typeof api.name == 'undefined' ||
+				typeof api.path == 'undefined' ||
+				typeof api.type == 'undefined') {
+				console.log('Invalid PUT request ' + api);
 			}
 			else {
 				if(!api.fullName) {
 					api.fullName = api.path + '/' + api.name;
 				}
+				if(!api.childern) {
+					api.children = [];
+				}
+				if(!api.attr) {
+					api.attr = [];
+				}
+				console.log(api);
 				db.put('api',api);
 			}
 		});
@@ -92,19 +95,23 @@ function start() {
 	app.put('/api/*',
 		function(req,res) {
 			api = req.body;
-			if(typeof api == undefined ||
-				typeof api.name == undefined ||
-				typeof api.path == undefined ||
-				typeof api.type == undefined ||
-				typeof api.children == undefined ||
-				typeof api.attr == undefined) {
-				
-				console.log('Invalid PUT request ' + req);
+			if(typeof api == 'undefined' ||
+				typeof api.name == 'undefined' ||
+				typeof api.path == 'undefined' ||
+				typeof api.type == 'undefined') {
+				console.log('Invalid PUT request ' + api);
 			}
 			else {
 				if(!api.fullName) {
 					api.fullName = api.path + '/' + api.name;
 				}
+				if(!api.childern) {
+					api.children = [];
+				}
+				if(!api.attr) {
+					api.attr = [];
+				}
+				console.log(api);
 				db.update('api',api);
 			}
 		});
