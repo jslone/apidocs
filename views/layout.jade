@@ -8,9 +8,19 @@ html
 			#logo
 				h1
 					a(href='/') APIDocs
-			#search-container
-				input(type='text' name='search')
-				input(type='button' onclick='search();')
+			#menu-container
+				#login-container
+					if !user
+						form(action='/login' method='post')
+						input(type='email' placeholder='email' name='username')
+						input(type='password' placeholder='password' name='password')
+						input(type='submit' value='Log In')
+					else
+						#{user.username}
+				#search-container
+					form(action='/search' method='get')
+						input(type='text' placeholder='search' name='search')
+						input(type='submit' value='Search')
 		.container
 			#nav-menu
 			#main-content

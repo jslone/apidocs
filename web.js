@@ -81,7 +81,7 @@ function start() {
 	app.get('/',
 		function(req,res) {
 			res.render('index',
-				{title : 'APIDocs'});
+				{title : 'APIDocs', user : req.user});
 		});
 	
 	//authentication
@@ -98,13 +98,15 @@ function start() {
 				function(err,results) {
 					console.log(results);
 					if(results.length > 0) {
-						res.render('api',{'api' : results[0]});
+						res.render('api',{api : results[0],
+											title : 'APIDocs - ' + results[0].fullName,
+											user : req.user});
 					}
 					//404
 					else {
 						res.status(404);
 						res.render('404',
-							{title : 'APIDocs - 404'});
+							{title : 'APIDocs - 404', user : req.user});
 					}
 				});
 		});
@@ -199,7 +201,7 @@ function start() {
 		function(req, res, next){
 			res.status(404);
 			res.render('404',
-				{title : 'APIDocs - 404'});
+				{title : 'APIDocs - 404', user : req.user});
 		});
 	
 	//start the web server
