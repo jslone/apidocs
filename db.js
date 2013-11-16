@@ -26,6 +26,7 @@ function put(col,items,callback) {
 		function(err,res) {
 			if(err)
 				console.log(err);
+			callback(err,res);
 		});
 }
 
@@ -35,6 +36,7 @@ function update(col,items,callback) {
 		function(err,res) {
 			if(err)
 				console.log(err);
+			callback(err,res);
 		});
 }
 
@@ -44,6 +46,7 @@ function del(col,items,callback) {
 		function(err,res) {
 			if(err)
 				console.log(err);
+			callback(err,res);
 		});
 }
 
