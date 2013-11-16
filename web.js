@@ -85,8 +85,42 @@ function start() {
 		});
 	
 	//authentication
+	
+	//login page
+	app.get('/login',
+		function (req,res) {
+			res.render('login',
+				{title : 'APIDocs - Login', user : req.user});
+		});
+
+	//authenticate a user
 	app.post('/login', passport.authenticate('local', { successRedirect: '/',
 	                                                    failureRedirect: '/login' }));
+	//create a new user
+	app.put('/login',
+		function (req,res) {
+			db.get('users',{username : req.user.username},
+				function(err,results) {
+					if(results.length > 0) {
+						res.writeHead(403,"Forbidden",{'Content-Type' : 'text/plain'});
+						res.end();
+					}
+					else {
+						db.put('users',user,
+							function (err) {
+								if(err) {
+									res.writeHead(500,"Internal Server Error",{'Content-Type' : 'text/plain'});
+									res.end(err);
+								}
+								else {
+									res.writeHead(201,"Created",{'Content-Type' : 'text/plain'});
+									res.end();
+								}
+							});
+					}
+				});
+		});
+
 
 	//get an existing api
 	app.get("/api/*",
