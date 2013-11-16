@@ -88,8 +88,6 @@ function start() {
 	app.post('/login', passport.authenticate('local', { successRedirect: '/',
 	                                                    failureRedirect: '/login' }));
 
-	//set up dynamic routing for requesting apis
-	
 	//get an existing api
 	app.get("/api/*",
 		function (req,res) {
