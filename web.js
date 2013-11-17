@@ -146,6 +146,12 @@ function start() {
 				});
 		});
 
+	//get a dummy root api, which has all language roots as children
+	app.get("/api",
+		function (req, res) {
+			//TODO: give dummy object. Maybe don't allow/don't care about json parameter?
+			console.log("Language roots");
+		});
 
 	//get an existing api
 	app.get("/api/*",
