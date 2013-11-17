@@ -156,16 +156,22 @@ function start() {
 	//get an existing api
 	app.get("/api/*",
 		function (req,res) {
-			var apiFullName = req.url.substring(5,req.url.length);
+			var apiFullName = req.params[0]
 			console.log(apiFullName);
 			
 			db.get('api',{fullName : apiFullName},
 				function(err,results) {
 					console.log(results);
 					if(results.length > 0) {
-						res.render('api',{api : results[0],
-											title : 'APIDocs - ' + results[0].fullName,
-											user : req.user});
+						if(typeof req.query.json != 'undefined') {
+							res.writeHead(200,'OK', {'Content-Type' : 'application/json'});
+							res.end(JSON.stringify(results[0]));
+						}
+						else {
+							res.render('api',{api : results[0],
+												title : 'APIDocs - ' + results[0].fullName,
+												user : req.user});
+						}
 					}
 					//404
 					else {
