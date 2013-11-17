@@ -46,6 +46,12 @@ app.set('view engine', 'jade');
 //	disk io
 app.use(express.static(__dirname + '/public'));
 
+app.use(express.cookieParser());
+app.use(express.session({secret : 'r=q%JryR]=us7|@oYL}"~5>T_#rWge;B'}));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(app.router);
+
 //Set up the authentication strategy, in this case, just see if
 //	the passwords match because we are already sending hashed
 //	passwords over https
@@ -63,7 +69,23 @@ passport.use(new LocalStrategy(
 			});
 	}));
 
+passport.serializeUser(
+	function(user,done) {
+		done(null,user._id);
+	});
 
+passport.deserializeUser(
+	function(id,done) {
+		db.get('users',{_id : id},
+			function(err,results) {
+				if(results.length > 0) {
+					done(err,results[0]);
+				}
+				else {
+					done(err,null);
+				}
+			});
+	});
 
 function start() {
 	//use https
@@ -97,15 +119,18 @@ function start() {
 	app.post('/login', passport.authenticate('local', { successRedirect: '/',
 	                                                    failureRedirect: '/login' }));
 	//create a new user
-	app.put('/login',
+	app.post('/account',
 		function (req,res) {
-			db.get('users',{username : req.user.username},
+			db.get('users',{username : req.body.username},
 				function(err,results) {
 					if(results.length > 0) {
 						res.writeHead(403,"Forbidden",{'Content-Type' : 'text/plain'});
 						res.end();
 					}
 					else {
+						var user = new Object();
+						user.username = req.body.username;
+						user.password = req.body.password;
 						db.put('users',user,
 							function (err) {
 								if(err) {

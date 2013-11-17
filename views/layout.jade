@@ -3,6 +3,9 @@ html
 	head
 		title #{title}
 		link(rel='stylesheet' href='/css/style.css')
+		script(href='https://ajax.googleapis.com/ajax/libs/jquery/2/jquery.min.js')
+		script(href='https://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js')
+		script(href='/js/script.js')
 	body
 		#header
 			#logo
@@ -16,7 +19,9 @@ html
 							input(type='password' placeholder='password' name='password')
 							input(type='submit' value='Log In')
 					else
-						#{user.username}
+						form(action='/logout' method='post')
+						label #{user.username}
+						input(type='submit' value='Logout')
 				#search-container
 					form(action='/search' method='get')
 						input(type='text' placeholder='search' name='search')
