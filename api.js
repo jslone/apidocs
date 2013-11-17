@@ -15,29 +15,25 @@ function mapChildren(api,f) {
 			api.children[i] = f(api.children[i]);
 		}
 	}
+	return api;
 }
 
 function purge(api) {
 	var newAPI = new Object();
 	newAPI.name = api.name;
 	newAPI.children = api.children;
-	mapChildren(newAPI,purge);
+	newAPI = mapChildren(newAPI,purge);
 	return newAPI;
 }
 
 //api has to be either elem or full name
-function loadChildren(api) {
-	mapChildren(api,
-		function(child) {
-			if(typeof child == 'string') {
-				var res = db.get({fullName : api.fullName + '/' + child});
-				if(res.length != 1)
-					console.log('Error loading children: db responded with ' + res);
-				else
-					child = res[0];
-			}
-			loadChildren(child);
-			return child;
+function loadChildren(api,callback) {
+	api = mapChildren(api,
+		function(name) {
+			return api.fullName + '/' + name;
 		});
-	return api;
+	db.get({fullName:{$in:api.children}},
+		function(err,res) {
+			callback(res);
+		});
 }

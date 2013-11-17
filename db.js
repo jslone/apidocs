@@ -1,8 +1,11 @@
 var mongo = require('mongodb');
 
-var mongoUri = process.env.MONGOLAB_URI
-			|| process.env.MONGOHQ_URL
-			|| 'mongodb://localhost/mydb';
+var mongoUri = (process.env.OPENSHIFT_MONGODB_DB_HOST ?
+			'mongodb://admin:E3W9bKIybng5@'
+			+ process.env.OPENSHIFT_MONGODB_DB_HOST
+			+ ':' + process.env.OPENSHIFT_MONGODB_DB_PORT
+			+ '/apidocs'
+			: 'mongodb://localhost/test');
 
 var mongoDB;
 
@@ -12,9 +15,9 @@ mongo.Db.connect(mongoUri, function (err, db) {
 	mongoDB = db;
 });
 
-function get(col,params) {
-	var api = mongoDB.collection(col);
-	return api.find(params);
+function get(col,params,callback) {
+	var collection = mongoDB.collection(col);
+	collection.find(params).toArray(callback);
 }
 
 function put(col,items,callback) {
@@ -23,6 +26,7 @@ function put(col,items,callback) {
 		function(err,res) {
 			if(err)
 				console.log(err);
+			callback(err,res);
 		});
 }
 
@@ -32,6 +36,7 @@ function update(col,items,callback) {
 		function(err,res) {
 			if(err)
 				console.log(err);
+			callback(err,res);
 		});
 }
 
@@ -41,6 +46,7 @@ function del(col,items,callback) {
 		function(err,res) {
 			if(err)
 				console.log(err);
+			callback(err,res);
 		});
 }
 

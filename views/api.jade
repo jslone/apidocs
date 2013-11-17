@@ -1,0 +1,24 @@
+extend layout
+block content
+	.breadcrumbs
+		p
+			- var tok = api.fullName.split('/');
+			- var url = '/api/';
+			- for(var i = 0; i < tok.length; i++) {
+			- 	url += tok[i];
+			!= '/<a href="' + url + '">' + tok[i] + '</a>'
+			- }
+	.unit
+		h1 Name
+		p #{api.name}
+	.unit
+		h1 Type
+		p #{api.type}
+	each val in api.attr
+		.unit
+			h1= val
+			p= api[val]
+	if api.children.length > 0
+		.unit
+			each val in api.children
+				p= val
