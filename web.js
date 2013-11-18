@@ -176,10 +176,16 @@ function start() {
 				});
 		});
 	
+	app.get('/upload',
+		function(req,res) {
+			res.render('upload',{title : 'APIDocs - Upload',
+									user : req.user});
+		});
+
 	//create a new api
 	app.post('/api/*',
 		function(req,res) {
-			api = req.body;
+			var api = JSON.parse(req.body.api);
 			if(typeof api == 'undefined' ||
 				typeof api.name == 'undefined' ||
 				typeof api.path == 'undefined' ||
