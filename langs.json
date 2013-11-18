@@ -2,7 +2,7 @@
     {
         "name" : "C",
         "path" : "",
-        "fullName" : "/C",
+        "fullName" : "C",
         "type" : "Language",
         "children" : [],
         "attr" : ["Description"],
@@ -13,7 +13,7 @@
     {
         "name" : "Java",
         "path" : "",
-        "fullName" : "/Java",
+        "fullName" : "Java",
         "type" : "Language",
         "children" : [],
         "attr" : ["Description"],
@@ -24,7 +24,7 @@
     {
         "name" : "C++",
         "path" : "",
-        "fullName" : "/C++",
+        "fullName" : "C++",
         "type" : "Language",
         "children" : [],
         "attr" : ["Description"],
@@ -35,7 +35,7 @@
     {
         "name" : "Node.js",
         "path" : "",
-        "fullName" : "/Node.js",
+        "fullName" : "Node.js",
         "type" : "Language",
         "children" : [],
         "attr" : ["Description"],
@@ -46,7 +46,7 @@
     {
         "name" : "JavaScript",
         "path" : "",
-        "fullName" : "/JavaScript",
+        "fullName" : "JavaScript",
         "type" : "Language",
         "children" : [],
         "attr" : ["Description"],

@@ -147,28 +147,6 @@ function start() {
 				});
 		});
 
-	//provides a callback with a list of the 'Language' APIElements (the top-level APIElements)
-	function getLangs(callback) {
-		// TODO: do this once at start?
-		var langFile = __dirname + '/' + 'langs.json';
-		fs.readFile(langFile, 'utf8', function(err, data) {
-			if (err) {
-				console.log(err);
-				return;
-			}
-
-			// Extract language names from data.
-			var langsData = JSON.parse(data);
-			var langs = [];
-			for (var i = 0; i < langsData.length; i++) {
-				var langData = langsData[i];
-				var langName = langData.name;
-				langs.push(langName);
-			}
-			callback(langs);
-		});
-	}
-
 	//respond to a request "req" for an API for which the database contains "results"
 	function respondWithApi(err, results, req, res) {
 		console.log(results);
@@ -194,17 +172,17 @@ function start() {
 	//get a dummy root api, which has all language roots as children
 	app.get("/api",
 		function (req, res) {
-			getLangs(
-				function (langs) {
-					var results = [{
-						name : '',
-        				path : '',
-        				fullName : '',
-        				type : 'Languages',
-        				children : langs,
-        				attr: [],
-					}];
-					respondWithApi(null, results, req, res);
+			db.get('api', {path : ''},
+				function(err, results) {
+					var api =
+					{
+						name : 'APIDocs',
+						path : '',
+						type : 'Collection',
+						children : results,
+						attr : []
+					};
+					respondWithApi(err,results,req,res);
 				});
 		});
 
@@ -218,47 +196,73 @@ function start() {
 				});
 		});
 	
+	app.get('/upload',
+		function(req,res) {
+			res.render('upload',{title : 'APIDocs - Upload',
+									user : req.user});
+		});
+
 	//create a new api
 	app.post('/api/*',
 		function(req,res) {
-			api = req.body;
-			if(typeof api == 'undefined' ||
-				typeof api.name == 'undefined' ||
-				typeof api.path == 'undefined' ||
-				typeof api.type == 'undefined') {
-				console.log('Invalid PUT request ' + api);
-			}
-			else {
-				if(!api.fullName) {
-					api.fullName = api.path + '/' + api.name;
-				}
-				if(!api.childern) {
-					api.children = [];
-				}
-				if(!api.attr) {
-					api.attr = [];
-				}
-				db.get('api',{fullName : api.fullName},
-					function(err,results) {
-						if(results.length > 0) { //can't create same name
-							res.writeHead(405, "Method not supported", {'Content-Type': 'text/plain'});
-							res.end("Allow: GET, PUT, DELETE");
+			fs.readFile(req.files.api.path,
+				function(err,data) {
+					var valid = true;
+					var input;
+					try {
+						input = JSON.parse(data);
+					}
+					catch(e) {
+						valid = false;
+					}
+					if(valid) {
+						for(var i = 0; i < input.length; i++) {
+							var api = input[i];
+							if(typeof api == 'undefined' ||
+								typeof api.name == 'undefined' ||
+								typeof api.path == 'undefined' ||
+								typeof api.type == 'undefined') {
+								valid = false;
+							}
+							if(valid) {
+								if(!api.fullName) {
+									api.fullName = api.path + '/' + api.name;
+								}
+								if(!api.childern) {
+									api.children = [];
+								}
+								if(!api.attr) {
+									api.attr = [];
+								}
+							}
 						}
-						else {
-							db.put('api',api,
-								function(err) {
-									if(err) {
-										res.writeHead(500,"Internal Server Error",{'Content-Type': 'text/plain'});
-										res.end(err);
-									}
-									else {
-										res.writeHead(201,"Created",{'Content-Type':'text/plain'});
-										res.end();
-									}
-								});
-						}
-					});
-			}
+					}
+					if(!valid) {
+						console.log('Invalid file uploaded');
+					}
+					else {
+						db.get('api',{fullName : {$in:input.map(function(api) {return api.fullName})}},
+							function(err,results) {
+								if(results.length > 0) { //can't create same name
+									res.writeHead(405, "Method not supported", {'Content-Type': 'text/plain'});
+									res.end("Allow: GET, PUT, DELETE");
+								}
+								else {
+									db.put('api',input,
+										function(err) {
+											if(err) {
+												res.writeHead(500,"Internal Server Error",{'Content-Type': 'text/plain'});
+												res.end(err);
+											}
+											else {
+												res.writeHead(201,"Created",{'Content-Type':'text/plain'});
+												res.end();
+											}
+										});
+								}
+							});
+					}
+				});
 		});
 
 	//update an existing api
