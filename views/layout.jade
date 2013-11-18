@@ -3,9 +3,9 @@ html
 	head
 		title #{title}
 		link(rel='stylesheet' href='/css/style.css')
-		script(href='https://ajax.googleapis.com/ajax/libs/jquery/2/jquery.min.js')
-		script(href='https://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js')
-		script(href='/js/script.js')
+		script(src='https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js')
+		script(src='https://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js')
+		script(src='/js/script.js')
 	body
 		#header
 			#logo
@@ -30,6 +30,8 @@ html
 						input(type='submit' value='Search')
 		.container
 			#nav-menu
+				.unit
+					h4 Browse APIs
 			#main-content
 				block content
 		#footer
