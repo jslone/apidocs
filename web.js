@@ -182,7 +182,7 @@ function start() {
 						children : results,
 						attr : []
 					};
-					respondWithApi(err,results,req,res);
+					respondWithApi(err, [api], req, res);
 				});
 		});
 

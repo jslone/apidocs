@@ -20,7 +20,7 @@ TODO: APIDocs-style function description.
 
 @End */
 function initNavMenu() {
-	expand("");
+	expand("", true);
 }
 
 // Given the id of a tree DOM element, get the absolute path to the
@@ -42,12 +42,13 @@ include all of its children.
 TODO: apidoc comment
 
 @End */
-function expand(parentPath) {
+function expand(parentPath, isRoot) {
 	// NOTE: for this to work, all nodes must contain an absolute path of the
 	// form "/.../name". Note the leading forward slash.
+	var url = isRoot ? "/api" : "/api/" + parentPath;
 	var req = $.ajax({
 		type: "GET",
-		url: "/api" + parentPath + "?json", // TODO: make sure that this works correctly with fullnames
+		url: url + "?json"
 	});
 
 	req.fail(function() {
