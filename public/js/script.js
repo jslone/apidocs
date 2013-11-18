@@ -62,11 +62,10 @@ function expand(parentPath, isRoot) {
 		for (var i = 0; i < children.length; i++) {
 			var childName = children[i];
 			var childNode = $("<li>");
-			var childAbsolutePath = parentPath + "/" + childName;
+			var childAbsolutePath = isRoot ? childName : parentPath + "/" + childName;
 			childNode.attr('id', idFromPath(childAbsolutePath));
-			addView(childNode);
 			addExpandButton(childNode);
-			childNode.append($("<span>").html(childName));
+			childNode.append($("<a href='/api/" + childAbsolutePath + "'>").html(childName));
 			childNodes.append(childNode);
 		}
 		parentNode.append(childNodes);
@@ -75,19 +74,7 @@ function expand(parentPath, isRoot) {
 
 // Displays the APIElem with the given absolute path.
 function display(path) {
-	var req = $.ajax({
-		type: "GET",
-		url: "/api" + path,  // TODO: make sure that this works correctly with fullnames
-	});
-
-	req.fail(function() {
-		console.error("Failed to display API element: " + path);
-	});
-
-	req.done(function(data) {
-		var main = $("#main-content");
-		main.html(data);
-	});
+	redirect('/api' + path);
 }
 
 // Given a node in the nav menu tree, configures it such that, when clicked, it

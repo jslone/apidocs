@@ -179,7 +179,7 @@ function start() {
 						name : 'APIDocs',
 						path : '',
 						type : 'Collection',
-						children : results,
+						children : results.map(function(api) {return api.name}),
 						attr : []
 					};
 					respondWithApi(err, [api], req, res);
@@ -228,7 +228,7 @@ function start() {
 								if(!api.fullName) {
 									api.fullName = api.path + '/' + api.name;
 								}
-								if(!api.childern) {
+								if(!api.children) {
 									api.children = [];
 								}
 								if(!api.attr) {
