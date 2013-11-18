@@ -4,7 +4,8 @@ var express = require('express'),
 	url = require('url'),
 	db = require('./db'),
 	passport = require('passport'),
-	LocalStrategy = require('passport-local').Strategy;
+	LocalStrategy = require('passport-local').Strategy,
+	fs = require('fs');
 
 
 //Use the env port when specified
@@ -146,11 +147,65 @@ function start() {
 				});
 		});
 
+	//provides a callback with a list of the 'Language' APIElements (the top-level APIElements)
+	function getLangs(callback) {
+		// TODO: do this once at start?
+		var langFile = __dirname + '/' + 'langs.json';
+		fs.readFile(langFile, 'utf8', function(err, data) {
+			if (err) {
+				console.log(err);
+				return;
+			}
+
+			// Extract language names from data.
+			var langsData = JSON.parse(data);
+			var langs = [];
+			for (var i = 0; i < langsData.length; i++) {
+				var langData = langsData[i];
+				var langName = langData.name;
+				langs.push(langName);
+			}
+			callback(langs);
+		});
+	}
+
+	//respond to a request "req" for an API for which the database contains "results"
+	function respondWithApi(err, results, req, res) {
+		console.log(results);
+		if(results.length > 0) {
+			if(typeof req.query.json != 'undefined') {
+				res.writeHead(200,'OK', {'Content-Type' : 'application/json'});
+				res.end(JSON.stringify(results[0]));
+			}
+			else {
+				res.render('api',{api : results[0],
+									title : 'APIDocs - ' + results[0].fullName,
+									user : req.user});
+			}
+		}
+		//404
+		else {
+			res.status(404);
+			res.render('404',
+				{title : 'APIDocs - 404', user : req.user});
+		}
+	}
+
 	//get a dummy root api, which has all language roots as children
 	app.get("/api",
 		function (req, res) {
-			//TODO: give dummy object. Maybe don't allow/don't care about json parameter?
-			console.log("Language roots");
+			getLangs(
+				function (langs) {
+					var results = [{
+						name : 'Languages',
+        				path : '',
+        				fullName : '/Languages',
+        				type : 'Languages',
+        				children : langs, // TODO: is this syntactically correct? should children be an array of APIElems, or just paths to them?
+        				attr: [],
+					}];
+					respondWithApi(null, results, req, res);
+				});
 		});
 
 	//get an existing api
@@ -158,27 +213,8 @@ function start() {
 		function (req,res) {
 			var apiFullName = req.params[0]
 			console.log(apiFullName);
-			
-			db.get('api',{fullName : apiFullName},
-				function(err,results) {
-					console.log(results);
-					if(results.length > 0) {
-						if(typeof req.query.json != 'undefined') {
-							res.writeHead(200,'OK', {'Content-Type' : 'application/json'});
-							res.end(JSON.stringify(results[0]));
-						}
-						else {
-							res.render('api',{api : results[0],
-												title : 'APIDocs - ' + results[0].fullName,
-												user : req.user});
-						}
-					}
-					//404
-					else {
-						res.status(404);
-						res.render('404',
-							{title : 'APIDocs - 404', user : req.user});
-					}
+			db.get('api',{fullName : apiFullName}, function(error, results) {
+					respondWithApi(error, results, req, res);
 				});
 		});
 	
