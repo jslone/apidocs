@@ -197,11 +197,11 @@ function start() {
 			getLangs(
 				function (langs) {
 					var results = [{
-						name : 'Languages',
+						name : '',
         				path : '',
-        				fullName : '/Languages',
+        				fullName : '',
         				type : 'Languages',
-        				children : langs, // TODO: is this syntactically correct? should children be an array of APIElems, or just paths to them?
+        				children : langs,
         				attr: [],
 					}];
 					respondWithApi(null, results, req, res);

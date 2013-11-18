@@ -9,7 +9,8 @@
 		"stylus" : "*",
 		"nib" : "*",
 		"passport" : "0.1.17",
-		"passport-local" : "0.1.6"
+		"passport-local" : "0.1.6",
+		"fs" : "*"
 	},
 	"engines" : {
 		"node" : "0.10.x",
