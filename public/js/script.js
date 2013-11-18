@@ -1,6 +1,8 @@
 /* @Doc
 
 TODO: APIDocs-style file description.
+TODO: add refresh button to remake tree/refresh automatically on upload
+TODO: jQuery may not like / in IDs
 
 @End */
 
@@ -43,8 +45,8 @@ TODO: apidoc comment
 
 @End */
 function expand(parentPath, isRoot) {
-	// NOTE: for this to work, all nodes must contain an absolute path of the
-	// form "/.../name". Note the leading forward slash.
+	console.log("Expanding path: " + parentPath);
+
 	var url = isRoot ? "/api" : "/api/" + parentPath;
 	var req = $.ajax({
 		type: "GET",
@@ -72,6 +74,14 @@ function expand(parentPath, isRoot) {
 	});
 }
 
+// Remove the branch below the nav menu branch corresponding to the given path.
+function collapse(path) {
+	console.log("Collapsing path: " + path);
+	var node = $("#" + idFromPath(path));
+	console.log(node);
+	node.children().remove("ul");
+}
+
 // Displays the APIElem with the given absolute path.
 function display(path) {
 	redirect('/api' + path);
@@ -94,10 +104,16 @@ function addExpandButton(node) {
 	var expandButton = $("<button>");
 	expandButton.html("+");
 	var path = pathFromId(node.attr('id'));
+	var expanded = false;
 	expandButton.click(function(e) {
 		console.log("Clicked expand for path: " + path);
 		e.stopPropagation();
-		expand(path);
+		if (expanded) {
+			collapse(path);
+		} else {
+			expand(path);
+		}
+		expanded = !expanded;
 	});
 	node.append(expandButton);
 }

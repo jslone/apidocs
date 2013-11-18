@@ -255,8 +255,7 @@ function start() {
 												res.end(err);
 											}
 											else {
-												res.writeHead(201,"Created",{'Content-Type':'text/plain'});
-												res.end();
+												updateParents(input, res);
 											}
 										});
 								}
@@ -264,6 +263,23 @@ function start() {
 					}
 				});
 		});
+
+	// After an apis are successfully added to the database, updates their
+	// parents to recognize their children. Will not re-add a child.
+	function updateParents(input, res) {
+		input.forEach(function(api) {
+			db.update('api', {fullName: api.path}, {$addToSet: {children: api.name}},
+				function(err) {
+					if (err) {
+						res.writeHead(500,"Internal Server Error",{'Content-Type': 'text/plain'});
+						res.end(err);
+					} else {
+						res.writeHead(201,"Created",{'Content-Type':'text/plain'});
+						res.end();
+					}
+				});
+		});
+	}
 
 	//update an existing api
 	app.put('/api/*',
@@ -286,7 +302,7 @@ function start() {
 					api.attr = [];
 				}
 				console.log(api);
-				db.update('api',api,
+				db.update('api',api,{},
 					function(err) {
 						if(err) {
 							res.writeHead(500,"Internal Server Error",{'Content-Type' : 'text/plain'});
