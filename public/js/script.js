@@ -17,7 +17,7 @@ TODO: APIDocs-style function description.
 function initNavMenu() {
 	var req = $.ajax({
 		type: "GET",
-		url: "api",
+		url: "/api",
 		data: {json: undefined},
 	});
 

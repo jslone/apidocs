@@ -194,17 +194,17 @@ function start() {
 	//get a dummy root api, which has all language roots as children
 	app.get("/api",
 		function (req, res) {
-			getLangs(
-				function (langs) {
-					var results = [{
-						name : 'Languages',
-        				path : '',
-        				fullName : '/Languages',
-        				type : 'Languages',
-        				children : langs, // TODO: is this syntactically correct? should children be an array of APIElems, or just paths to them?
-        				attr: [],
-					}];
-					respondWithApi(null, results, req, res);
+			db.get('api', {path : ''},
+				function(err, results) {
+					var api =
+					{
+						name : 'APIDocs',
+						path : '',
+						type : 'Collection',
+						children : results,
+						attr : []
+					};
+					respondWithApi(err,results,req,res);
 				});
 		});
 
@@ -227,44 +227,64 @@ function start() {
 	//create a new api
 	app.post('/api/*',
 		function(req,res) {
-			var api = JSON.parse(req.body.api);
-			if(typeof api == 'undefined' ||
-				typeof api.name == 'undefined' ||
-				typeof api.path == 'undefined' ||
-				typeof api.type == 'undefined') {
-				console.log('Invalid PUT request ' + api);
-			}
-			else {
-				if(!api.fullName) {
-					api.fullName = api.path + '/' + api.name;
-				}
-				if(!api.childern) {
-					api.children = [];
-				}
-				if(!api.attr) {
-					api.attr = [];
-				}
-				db.get('api',{fullName : api.fullName},
-					function(err,results) {
-						if(results.length > 0) { //can't create same name
-							res.writeHead(405, "Method not supported", {'Content-Type': 'text/plain'});
-							res.end("Allow: GET, PUT, DELETE");
+			fs.readFile(req.files.api.path,
+				function(err,data) {
+					var valid = true;
+					var input;
+					try {
+						input = JSON.parse(data);
+					}
+					catch(e) {
+						valid = false;
+					}
+					if(valid) {
+						for(var i = 0; i < input.length; i++) {
+							var api = input[i];
+							if(typeof api == 'undefined' ||
+								typeof api.name == 'undefined' ||
+								typeof api.path == 'undefined' ||
+								typeof api.type == 'undefined') {
+								valid = false;
+							}
+							if(valid) {
+								if(!api.fullName) {
+									api.fullName = api.path + '/' + api.name;
+								}
+								if(!api.childern) {
+									api.children = [];
+								}
+								if(!api.attr) {
+									api.attr = [];
+								}
+							}
 						}
-						else {
-							db.put('api',api,
-								function(err) {
-									if(err) {
-										res.writeHead(500,"Internal Server Error",{'Content-Type': 'text/plain'});
-										res.end(err);
-									}
-									else {
-										res.writeHead(201,"Created",{'Content-Type':'text/plain'});
-										res.end();
-									}
-								});
-						}
-					});
-			}
+					}
+					if(!valid) {
+						console.log('Invalid file uploaded');
+					}
+					else {
+						db.get('api',{fullName : {$in:input.map(function(api) {return api.fullName})}},
+							function(err,results) {
+								if(results.length > 0) { //can't create same name
+									res.writeHead(405, "Method not supported", {'Content-Type': 'text/plain'});
+									res.end("Allow: GET, PUT, DELETE");
+								}
+								else {
+									db.put('api',input,
+										function(err) {
+											if(err) {
+												res.writeHead(500,"Internal Server Error",{'Content-Type': 'text/plain'});
+												res.end(err);
+											}
+											else {
+												res.writeHead(201,"Created",{'Content-Type':'text/plain'});
+												res.end();
+											}
+										});
+								}
+							});
+					}
+				});
 		});
 
 	//update an existing api
