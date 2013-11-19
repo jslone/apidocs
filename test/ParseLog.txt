@@ -1,0 +1,3 @@
+[20131117_162706]	No API file for Directory:/home/tim/test/test2
+[20131117_162706]	Comment block at line 12 in test.api is missing an essential property
+[20131117_162706]	Parsing of /home/tim/test completed
