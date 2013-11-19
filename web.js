@@ -4,7 +4,8 @@ var express = require('express'),
 	url = require('url'),
 	db = require('./db'),
 	passport = require('passport'),
-	LocalStrategy = require('passport-local').Strategy;
+	LocalStrategy = require('passport-local').Strategy,
+	fs = require('fs');
 
 
 //Use the env port when specified
@@ -146,72 +147,139 @@ function start() {
 				});
 		});
 
+	//respond to a request "req" for an API for which the database contains "results"
+	function respondWithApi(err, results, req, res) {
+		console.log(results);
+		if(results.length > 0) {
+			if(typeof req.query.json != 'undefined') {
+				res.writeHead(200,'OK', {'Content-Type' : 'application/json'});
+				res.end(JSON.stringify(results[0]));
+			}
+			else {
+				res.render('api',{api : results[0],
+									title : 'APIDocs - ' + results[0].fullName,
+									user : req.user});
+			}
+		}
+		//404
+		else {
+			res.status(404);
+			res.render('404',
+				{title : 'APIDocs - 404', user : req.user});
+		}
+	}
+
+	//get a dummy root api, which has all language roots as children
+	app.get("/api",
+		function (req, res) {
+			db.get('api', {path : ''},
+				function(err, results) {
+					var api =
+					{
+						name : 'APIDocs',
+						path : '',
+						type : 'Collection',
+						children : results.map(function(api) {return api.name}),
+						attr : []
+					};
+					respondWithApi(err, [api], req, res);
+				});
+		});
 
 	//get an existing api
 	app.get("/api/*",
 		function (req,res) {
-			var apiFullName = req.url.substring(5,req.url.length);
+			var apiFullName = req.params[0]
 			console.log(apiFullName);
-			
-			db.get('api',{fullName : apiFullName},
-				function(err,results) {
-					console.log(results);
-					if(results.length > 0) {
-						res.render('api',{api : results[0],
-											title : 'APIDocs - ' + results[0].fullName,
-											user : req.user});
-					}
-					//404
-					else {
-						res.status(404);
-						res.render('404',
-							{title : 'APIDocs - 404', user : req.user});
-					}
+			db.get('api',{fullName : apiFullName}, function(error, results) {
+					respondWithApi(error, results, req, res);
 				});
 		});
 	
+	app.get('/upload',
+		function(req,res) {
+			res.render('upload',{title : 'APIDocs - Upload',
+									user : req.user});
+		});
+
 	//create a new api
 	app.post('/api/*',
 		function(req,res) {
-			api = req.body;
-			if(typeof api == 'undefined' ||
-				typeof api.name == 'undefined' ||
-				typeof api.path == 'undefined' ||
-				typeof api.type == 'undefined') {
-				console.log('Invalid PUT request ' + api);
-			}
-			else {
-				if(!api.fullName) {
-					api.fullName = api.path + '/' + api.name;
-				}
-				if(!api.childern) {
-					api.children = [];
-				}
-				if(!api.attr) {
-					api.attr = [];
-				}
-				db.get('api',{fullName : api.fullName},
-					function(err,results) {
-						if(results.length > 0) { //can't create same name
-							res.writeHead(405, "Method not supported", {'Content-Type': 'text/plain'});
-							res.end("Allow: GET, PUT, DELETE");
+			fs.readFile(req.files.api.path,
+				function(err,data) {
+					var valid = true;
+					var input;
+					try {
+						input = JSON.parse(data);
+					}
+					catch(e) {
+						valid = false;
+					}
+					if(valid) {
+						for(var i = 0; i < input.length; i++) {
+							var api = input[i];
+							if(typeof api == 'undefined' ||
+								typeof api.name == 'undefined' ||
+								typeof api.path == 'undefined' ||
+								typeof api.type == 'undefined') {
+								valid = false;
+							}
+							if(valid) {
+								if(!api.fullName) {
+									api.fullName = api.path + '/' + api.name;
+								}
+								if(!api.children) {
+									api.children = [];
+								}
+								if(!api.attr) {
+									api.attr = [];
+								}
+							}
 						}
-						else {
-							db.put('api',api,
-								function(err) {
-									if(err) {
-										res.writeHead(500,"Internal Server Error",{'Content-Type': 'text/plain'});
-										res.end(err);
-									}
-									else {
-										res.writeHead(201,"Created",{'Content-Type':'text/plain'});
-										res.end();
-									}
-								});
-						}
-					});
-			}
+					}
+					if(!valid) {
+						console.log('Invalid file uploaded');
+					}
+					else {
+						db.get('api',{fullName : {$in:input.map(function(api) {return api.fullName})}},
+							function(err,results) {
+								if(results.length > 0) { //can't create same name
+									res.writeHead(405, "Method not supported", {'Content-Type': 'text/plain'});
+									res.end("Allow: GET, PUT, DELETE");
+								}
+								else {
+									db.put('api',input,
+										function(err) {
+											if(err) {
+												res.writeHead(500,"Internal Server Error",{'Content-Type': 'text/plain'});
+												res.end(err);
+											}
+											else {
+												updateParents(input, res);
+											}
+										});
+								}
+							});
+					}
+				});
 		});
+
+	// After an apis are successfully added to the database, updates their
+	// parents to recognize their children. Will not re-add a child.
+	function updateParents(input, res) {
+		input.forEach(function(api) {
+			db.update('api', {fullName: api.path}, {$addToSet: {children: api.name}},
+				function(err) {
+					if (err) {
+						res.writeHead(500,"Internal Server Error",{'Content-Type': 'text/plain'});
+						res.end(err);
+					} else {
+						res.writeHead(201,"Created",{'Content-Type':'text/plain'});
+						res.end();
+					}
+				});
+		});
+	}
 
 	//update an existing api
 	app.put('/api/*',
@@ -234,7 +302,7 @@ function start() {
 					api.attr = [];
 				}
 				console.log(api);
-				db.update('api',api,
+				db.update('api',api,{},
 					function(err) {
 						if(err) {
 							res.writeHead(500,"Internal Server Error",{'Content-Type' : 'text/plain'});

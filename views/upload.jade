@@ -1,0 +1,7 @@
+extend layout
+block content
+	.unit
+		form(action='/api/upload' enctype="multipart/form-data" method='post')
+			input(type='file' name='api' value='File to Upload')
+			br
+			input(type='submit' value='Upload')

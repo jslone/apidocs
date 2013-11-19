@@ -30,9 +30,9 @@ function put(col,items,callback) {
 		});
 }
 
-function update(col,items,callback) {
+function update(col,items,params,callback) {
 	var api = mongoDB.collection(col);
-	api.update(items,{w:1},
+	api.update(items,params, {w: 1},
 		function(err,res) {
 			if(err)
 				console.log(err);
