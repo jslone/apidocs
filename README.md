@@ -11,6 +11,7 @@ APIDocs - A web project which will generate and host organized API documentation
     (any other designated parameters prefixed by @, such as:
     @return:void
     @arguments:int x,int y
+    @randomthing:anything, really
     etc.)
 
     @End */
