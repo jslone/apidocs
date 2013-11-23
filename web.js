@@ -249,70 +249,62 @@ function start() {
 	}
 
 	//upload a single api elem
-	function uploadAPI(api,root,user,done) {
-		if(validAPI(api,root)) {
-			db.get('api',{fullName : api.fullName},
-				function(err,results) {
-					if(results.length > 0 &&
-						results[0].user_id &&
-						!results[0].user_id.equals(user._id)) { //can't create same name
-						done("Permission Denied");
-					}
-					else {
-						if(results.length == 0 && api.path != '') {
-							db.get('api', {fullName : api.path},
-								function(err,results) {
-									if(results.length == 0) {
-										done("No parent exists");
-									}
-									else if(results[0].user_id && !results[0].user_id.equals(user._id)) {
-										done("Permission Denied");
-									}
-									else {
-										if(!api.user_id)
-											api.user_id = user._id;
-										db.update('api',
-											{fullName : api.fullName},
-											api,
-											function(err) {
-												if(err) {
-													console.log(err);
-													done(err);
-												}
-												else {
-													updateParents(api,done);
-												}
-											});
-									}
-								});
-						}
-						if(typeof api.user_id == 'undefined')
-							api.user_id = user._id;
-						db.update('api',
-							{fullName : api.fullName},
-							api,
-							function(err) {
-								if(err) {
-									console.log(err);
-									done(err);
+	function uploadAPI(api,user,done) {
+		db.get('api',{fullName : api.fullName},
+			function(err,results) {
+				if(results.length > 0 &&
+					results[0].user_id &&
+					!results[0].user_id.equals(user._id)) { //can't create same name
+					done("Permission Denied");
+				}
+				else {
+					if(results.length == 0 && api.path != '') {
+						db.get('api', {fullName : api.path},
+							function(err,results) {
+								if(results.length == 0) {
+									done("No parent exists");
+								}
+								else if(results[0].user_id && !results[0].user_id.equals(user._id)) {
+									done("Permission Denied");
 								}
 								else {
-									updateParents(api,done);
+									if(!api.user_id)
+										api.user_id = user._id;
+									db.update('api',
+										{fullName : api.fullName},
+										api,
+										function(err) {
+											if(err) {
+												console.log(err);
+												done(err);
+											}
+											else {
+												updateParents(api,done);
+											}
+										});
 								}
 							});
 					}
-				});
-		}
-		else {
-			done("Invalid API");
-		}
+					if(typeof api.user_id == 'undefined')
+						api.user_id = user._id;
+					db.update('api',
+						{fullName : api.fullName},
+						api,
+						function(err) {
+							if(err) {
+								console.log(err);
+								done(err);
+							}
+							else {
+								updateParents(api,done);
+							}
+						});
+				}
+			});
 	}
 	//upload a list of api elems
-	function uploadAPIs(apis,root,user,done) {
+	function uploadAPIs(apis,user,done) {
 		function uploadAPIsHelper(toLoad,loaded,index) {
-			console.log(toLoad);
-			console.log(loaded);
-			console.log(index);
 			if(apis.length == 0) {
 				done(false);
 			}
@@ -325,7 +317,7 @@ function start() {
 				}
 			}
 			else {
-				uploadAPI(toLoad[index],root,user,
+				uploadAPI(toLoad[index],user,
 					function (err) {
 						if(err) {
 							console.log(err);
@@ -362,14 +354,23 @@ function start() {
 								error : "Malformed File"});
 					}
 					else {
-						uploadAPIs(input,req.body.root,req.user,
-							function(err) {
-								res.status(err ? 403 : 201);
-								res.render('uploaded',
-									{title : 'APIDocs - Uploaded',
-										user: req.user,
-										error : err});
-							});
+						if(input.every(function(api) {return validAPI(api,req.body.root);})) {
+							uploadAPIs(input,req.user,
+								function(err) {
+									res.status(err ? 403 : 201);
+									res.render('uploaded',
+										{title : 'APIDocs - Uploaded',
+											user: req.user,
+											error : err});
+								});
+						}
+						else {
+							res.status(400);
+							res.render('uploaded',
+								{title : 'APIDocs - Uploaded',
+									user: req.user,
+									error : 'Malformed API Elem format'});
+						}
 					}
 				});
 		});
@@ -386,6 +387,17 @@ function start() {
 		function(req,res) {
 			var apiFullName = req.url.substring(5,req.url.length);
 			db.del({fullName : apiFullName});
+		});
+
+	app.get('/search',
+		function(req,res) {
+			db.get('api', {name : req.body.search},
+				function(err,results) {
+					res.render('search',
+						{title : 'APIDocs - Search Results',
+							user : req.user,
+							results : results});
+				});
 		});
 	
 	//404 for everything else
