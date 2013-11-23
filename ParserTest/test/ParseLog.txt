@@ -1,0 +1,9 @@
+[2013-11-21_12:45]	Use of a reserved keyword is being skipped at line 4 in file /home/tim/Dropbox/CMU/F13/15221/apidocs/test/test.api
+[2013-11-21_12:45]	Use of a reserved keyword is being skipped at line 7 in file /home/tim/Dropbox/CMU/F13/15221/apidocs/test/test.api
+[2013-11-21_12:45]	Use of a reserved keyword is being skipped at line 6 in file /home/tim/Dropbox/CMU/F13/15221/apidocs/test/test.api~
+[2013-11-21_12:45]	Comment block at line 12 in /home/tim/Dropbox/CMU/F13/15221/apidocs/test/test.api~ is missing an essential property
+[2013-11-21_12:45]	Use of a reserved keyword is being skipped at line 4 in file /home/tim/Dropbox/CMU/F13/15221/apidocs/test/test2/test.api
+[2013-11-21_12:45]	Use of a reserved keyword is being skipped at line 7 in file /home/tim/Dropbox/CMU/F13/15221/apidocs/test/test2/test.api
+[2013-11-21_12:45]	Comment block at line 12 in /home/tim/Dropbox/CMU/F13/15221/apidocs/test/test2/test.api is missing an essential property
+[2013-11-21_12:45]	Use of a reserved keyword is being skipped at line 5 in file /home/tim/Dropbox/CMU/F13/15221/apidocs/test/test2/test.txt
+[2013-11-21_12:45]	Parsing of /home/tim/Dropbox/CMU/F13/15221/apidocs/test completed
