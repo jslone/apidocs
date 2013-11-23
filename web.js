@@ -391,8 +391,9 @@ function start() {
 
 	app.get('/search',
 		function(req,res) {
-			db.get('api', {name : req.body.search},
+			db.get('api', {name : req.query.search},
 				function(err,results) {
+					console.log(results);
 					res.render('search',
 						{title : 'APIDocs - Search Results',
 							user : req.user,
