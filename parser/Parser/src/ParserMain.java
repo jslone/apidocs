@@ -48,8 +48,6 @@ public class ParserMain {
 	}
 
 	public static void main(String[] args) {
-
-
 		if(args.length<1)
 		{
 			System.out.println("You must provide a path to parse");
@@ -114,11 +112,13 @@ public class ParserMain {
 				continue;
 			}
 			if (fileEntry.isDirectory()) {
-				children.add(parseDirectory(fileEntry,path+"/"+dirname));
+				String p = (path.equals("")) ? dirname : path + "/" + dirname;
+				children.add(parseDirectory(fileEntry,p));
 			}
 			else
 			{
-				JsonArray filechildren = parseFile(fileEntry,path+"/"+dirname);
+				String p = (path.equals("")) ? dirname : path + "/" + dirname;
+				JsonArray filechildren = parseFile(fileEntry,p);
 				children.addAll(filechildren);
 			}
 		}
@@ -182,6 +182,7 @@ public class ParserMain {
 								if(!obj.has("children"))
 									obj.add("children", new JsonArray());
 								obj.add("attr", attr);
+								obj.addProperty("path",path);
 								objects.add(obj);
 								fileobjs.add(new JsonPrimitive(obj.get("name").getAsString()));
 								obj = new JsonObject();
@@ -297,6 +298,13 @@ public class ParserMain {
 								{
 									log("Comment block at line "+counter+" in "+file.getPath() +" is missing an essential property");
 								}
+								if(obj.has("name"))
+								{
+									obj.addProperty("path", path);
+									if(!obj.has("children"))
+										obj.add("children", new JsonArray());
+									return obj;
+								}
 								obj.add("attr", attr);
 								return obj;
 							}
@@ -359,13 +367,7 @@ public class ParserMain {
 		{
 			log("File structure corrupted at "+file.getPath() );
 		}
-		if(obj.has("name"))
-		{
-			obj.addProperty("path", path);
-			if(!obj.has("children"))
-				obj.add("children", new JsonArray());
-			return obj;
-		}
+
 		return null;
 	}
 
