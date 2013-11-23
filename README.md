@@ -4,11 +4,14 @@ apidocs
 APIDocs - A web project which will generate and host organized API documentation. Currently hosted <a href=https://apidocs-jslone.rhcloud.com/>here</a>.
 
 /* @Doc
-  
+
     @name:toString
-    @path:Code/Folder/Strings/
     @type:function
-    @description:This function strings the @Link(Blah/Blahdy) aaaaa
-    @attr:[]
+    @description:This function strings the blah
+    (any other designated parameters prefixed by @, such as:
+    @return:void
+    @arguments:int x,int y
+    @randomthing:anything, really
+    etc.)
 
     @End */
