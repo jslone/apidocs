@@ -1,7 +1,12 @@
 extend layout
 block content
 	.unit
-		form(action='/api/upload' enctype="multipart/form-data" method='post')
+		form(action='/upload' enctype="multipart/form-data" method='post')
+			select(name = 'root')
+				each api in roots
+					option(value='#{api.fullName}') #{api.fullName}
+				option(value='') Add Language
+			br
 			input(type='file' name='api' value='File to Upload')
 			br
 			input(type='submit' value='Upload')

@@ -1,0 +1,9 @@
+[
+	{
+		"name" : "test",
+		"path" : "",
+		"type" : "test",
+		"attr" : ["desc"],
+		"desc" : "this is my test"
+	}
+]
