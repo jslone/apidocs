@@ -1,9 +1,0 @@
-/* @Doc
-  
-    @name:toString
-    @path:Code/Folder/Strings/
-    @type:function
-    @description:This function strings the @Link(Blah/Blahdy) aaaaa
-    @attr:[]
-
-    @End */
