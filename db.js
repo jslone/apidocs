@@ -1,4 +1,5 @@
-var mongo = require('mongodb');
+var mongo = require('mongodb'),
+	ObjectID = require('mongodb').ObjectID;
 
 var mongoUri = (process.env.OPENSHIFT_MONGODB_DB_HOST ?
 			'mongodb://admin:E3W9bKIybng5@'
@@ -32,7 +33,7 @@ function put(col,items,callback) {
 
 function update(col,items,params,callback) {
 	var api = mongoDB.collection(col);
-	api.update(items,params, {w: 1},
+	api.update(items,params, {upsert : true},
 		function(err,res) {
 			if(err)
 				console.log(err);
@@ -54,3 +55,4 @@ exports.get = get
 exports.put = put
 exports.update = update
 exports.del = del
+exports.ObjectID = ObjectID

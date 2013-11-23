@@ -19,7 +19,7 @@ html
 							input(type='password' placeholder='password' name='password')
 							input(type='submit' value='Log In')
 					else
-						form(action='/logout' method='post')
+						form(action='/logout' method='get')
 							label #{user.username}
 							a(href='/upload')
 								input(type='button' value='Upload')

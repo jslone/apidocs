@@ -60,9 +60,9 @@ passport.use(new LocalStrategy(
 	function(username, password, done) {
 		db.get('users',{ username: username },
 			function (err, res) {
-				if (err) { return done(err); }
+				if (err) { return done(err,false); }
 				if (res.length == 0) {return done(null,false);}
-				user = res[0];
+				var user = res[0];
 				if(user.password == password)
 					return done(null,user);
 				else
@@ -77,7 +77,7 @@ passport.serializeUser(
 
 passport.deserializeUser(
 	function(id,done) {
-		db.get('users',{_id : id},
+		db.get('users',{_id : db.ObjectID(id)},
 			function(err,results) {
 				if(results.length > 0) {
 					done(err,results[0]);
@@ -119,6 +119,13 @@ function start() {
 	//authenticate a user
 	app.post('/login', passport.authenticate('local', { successRedirect: '/',
 	                                                    failureRedirect: '/login' }));
+	//log the user out
+	app.get('/logout', 
+		function(req,res) {
+			req.logout();
+			res.redirect('/');
+		});
+
 	//create a new user
 	app.post('/account',
 		function (req,res) {
@@ -202,8 +209,121 @@ function start() {
 									user : req.user});
 		});
 
+	//
+	function validAPI(api) {
+		if(typeof api == 'undefined' ||
+			typeof api.name == 'undefined' ||
+			typeof api.path == 'undefined' ||
+			typeof api.type == 'undefined') {
+			return false;
+		}
+		if(!api.fullName) {
+			api.fullName = api.path + '/' + api.name;
+		}
+		if(!api.children) {
+			api.children = [];
+		}
+		if(!api.attr) {
+			api.attr = [];
+		}
+		return true;
+	}
+
+	//upload a single api elem
+	function uploadAPI(api,user,done) {
+		if(validAPI(api)) {
+			db.get('api',{fullName : api.fullName},
+				function(err,results) {
+					if(results.length > 0 &&
+						results[0].user_id &&
+						!results[0].user_id.equals(user._id)) { //can't create same name
+						done("Permission Denied");
+					}
+					else {
+						if(results.length == 0 && api.path != '') {
+							db.get('api', {fullName : api.path},
+								function(err,results) {
+									if(results.length == 0) {
+										done("No parent exists");
+									}
+									else if(results[0].user_id && !results[0].user_id.equals(user._id)) {
+										done("Permission Denied");
+									}
+									else {
+										if(!api.user_id)
+											api.user_id = user._id;
+										db.update('api',
+											{fullName : api.fullName},
+											api,
+											function(err) {
+												if(err) {
+													console.log(err);
+													done(err);
+												}
+												else {
+													updateParents(api,done);
+												}
+											});
+									}
+								});
+						}
+						if(typeof api.user_id == 'undefined')
+							api.user_id = user._id;
+						db.update('api',
+							{fullName : api.fullName},
+							api,
+							function(err) {
+								if(err) {
+									console.log(err);
+									done(err);
+								}
+								else {
+									updateParents(api,done);
+								}
+							});
+					}
+				});
+		}
+		else {
+			done("Invalid API");
+		}
+	}
+	//upload a list of api elems
+	function uploadAPIs(apis,user,done) {
+		function uploadAPIsHelper(toLoad,loaded,index) {
+			console.log(toLoad);
+			console.log(loaded);
+			console.log(index);
+			if(apis.length == 0) {
+				done(false);
+			}
+			else if(index == toLoad.length) {
+				if(loaded == 0) {
+					done("Could not load one or more elements");
+				}
+				else {
+					uploadAPIsHelper(toLoad,0,0);
+				}
+			}
+			else {
+				uploadAPI(toLoad[index],user,
+					function (err) {
+						if(err) {
+							console.log(err);
+							uploadAPIsHelper(toLoad,loaded,index + 1);
+						}
+						else {
+							toLoad.splice(index,1);
+							uploadAPIsHelper(toLoad,loaded + 1,index);
+						}
+					});
+			}
+		}
+		uploadAPIsHelper(apis,0,0);
+	}
+
 	//create a new api
-	app.post('/api/*',
+	app.post('/upload',
 		function(req,res) {
 			fs.readFile(req.files.api.path,
 				function(err,data) {
@@ -215,50 +335,21 @@ function start() {
 					catch(e) {
 						valid = false;
 					}
-					if(valid) {
-						for(var i = 0; i < input.length; i++) {
-							var api = input[i];
-							if(typeof api == 'undefined' ||
-								typeof api.name == 'undefined' ||
-								typeof api.path == 'undefined' ||
-								typeof api.type == 'undefined') {
-								valid = false;
-							}
-							if(valid) {
-								if(!api.fullName) {
-									api.fullName = api.path + '/' + api.name;
-								}
-								if(!api.children) {
-									api.children = [];
-								}
-								if(!api.attr) {
-									api.attr = [];
-								}
-							}
-						}
-					}
 					if(!valid) {
-						console.log('Invalid file uploaded');
+						res.status(400);
+						res.render('uploaded',
+							{title : 'APIDocs - Uploaded',
+								user : req.user,
+								error : "Malformed File"});
 					}
 					else {
-						db.get('api',{fullName : {$in:input.map(function(api) {return api.fullName})}},
-							function(err,results) {
-								if(results.length > 0) { //can't create same name
-									res.writeHead(405, "Method not supported", {'Content-Type': 'text/plain'});
-									res.end("Allow: GET, PUT, DELETE");
-								}
-								else {
-									db.put('api',input,
-										function(err) {
-											if(err) {
-												res.writeHead(500,"Internal Server Error",{'Content-Type': 'text/plain'});
-												res.end(err);
-											}
-											else {
-												updateParents(input, res);
-											}
-										});
-								}
+						uploadAPIs(input,req.user,
+							function(err) {
+								res.status(err ? 403 : 201);
+								res.render('uploaded',
+									{title : 'APIDocs - Uploaded',
+										user: req.user,
+										error : err});
 							});
 					}
 				});
@@ -266,55 +357,10 @@ function start() {
 
 	// After an apis are successfully added to the database, updates their
 	// parents to recognize their children. Will not re-add a child.
-	function updateParents(input, res) {
-		input.forEach(function(api) {
-			db.update('api', {fullName: api.path}, {$addToSet: {children: api.name}},
-				function(err) {
-					if (err) {
-						res.writeHead(500,"Internal Server Error",{'Content-Type': 'text/plain'});
-						res.end(err);
-					} else {
-						res.writeHead(201,"Created",{'Content-Type':'text/plain'});
-						res.end();
-					}
-				});
-		});
+	function updateParents(api, done) {
+		db.update('api', {fullName: api.path}, {$addToSet: {children: api.name}},done);
 	}
 
-	//update an existing api
-	app.put('/api/*',
-		function(req,res) {
-			api = req.body;
-			if(typeof api == 'undefined' ||
-				typeof api.name == 'undefined' ||
-				typeof api.path == 'undefined' ||
-				typeof api.type == 'undefined') {
-				console.log('Invalid PUT request ' + api);
-			}
-			else {
-				if(!api.fullName) {
-					api.fullName = api.path + '/' + api.name;
-				}
-				if(!api.childern) {
-					api.children = [];
-				}
-				if(!api.attr) {
-					api.attr = [];
-				}
-				console.log(api);
-				db.update('api',api,{},
-					function(err) {
-						if(err) {
-							res.writeHead(500,"Internal Server Error",{'Content-Type' : 'text/plain'});
-							res.end(err);
-						}
-						else {
-							res.writeHead(200,"OK",{'Content-Type' : 'text/plain'});
-							res.end();
-						}
-					});
-			}
-		});
 	
 	//delete an existing api
 	app.del('/api/*',
