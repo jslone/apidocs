@@ -205,12 +205,16 @@ function start() {
 	
 	app.get('/upload',
 		function(req,res) {
-			res.render('upload',{title : 'APIDocs - Upload',
-									user : req.user});
+			db.get('api',{path : ''},
+				function(err,results) {
+					res.render('upload',{title : 'APIDocs - Upload',
+											user : req.user,
+											roots : results});
+				});
 		});
 
 	//
-	function validAPI(api) {
+	function validAPI(api,root) {
 		if(typeof api == 'undefined' ||
 			typeof api.name == 'undefined' ||
 			typeof api.path == 'undefined' ||
@@ -218,7 +222,12 @@ function start() {
 			return false;
 		}
 		if(!api.fullName) {
-			api.fullName = api.path + '/' + api.name;
+			if(api.path != '') {
+				api.fullName = api.path + '/' + api.name;
+			}
+			else {
+				api.fullName = api.name;
+			}
 		}
 		if(!api.children) {
 			api.children = [];
@@ -226,12 +235,22 @@ function start() {
 		if(!api.attr) {
 			api.attr = [];
 		}
+		if(root != '') {
+			if(api.path == '') {
+				api.path = root;
+				api.fullName = root + '/' + api.fullName;
+			}
+			else {
+				api.path = root + '/' + api.path;
+				api.fullName = root + '/' + api.fullName;
+			}
+		}
 		return true;
 	}
 
 	//upload a single api elem
-	function uploadAPI(api,user,done) {
-		if(validAPI(api)) {
+	function uploadAPI(api,root,user,done) {
+		if(validAPI(api,root)) {
 			db.get('api',{fullName : api.fullName},
 				function(err,results) {
 					if(results.length > 0 &&
@@ -289,7 +308,7 @@ function start() {
 		}
 	}
 	//upload a list of api elems
-	function uploadAPIs(apis,user,done) {
+	function uploadAPIs(apis,root,user,done) {
 		function uploadAPIsHelper(toLoad,loaded,index) {
 			console.log(toLoad);
 			console.log(loaded);
@@ -306,7 +325,7 @@ function start() {
 				}
 			}
 			else {
-				uploadAPI(toLoad[index],user,
+				uploadAPI(toLoad[index],root,user,
 					function (err) {
 						if(err) {
 							console.log(err);
@@ -343,7 +362,7 @@ function start() {
 								error : "Malformed File"});
 					}
 					else {
-						uploadAPIs(input,req.user,
+						uploadAPIs(input,req.body.root,req.user,
 							function(err) {
 								res.status(err ? 403 : 201);
 								res.render('uploaded',

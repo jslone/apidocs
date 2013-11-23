@@ -1,7 +1,7 @@
 [
 	{
 		"name" : "test",
-		"path" : "C",
+		"path" : "",
 		"type" : "test",
 		"attr" : ["desc"],
 		"desc" : "this is my test"
