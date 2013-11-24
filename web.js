@@ -389,6 +389,7 @@ function start() {
 			db.del({fullName : apiFullName});
 		});
 
+	//search for apis with matching name
 	app.get('/search',
 		function(req,res) {
 			db.get('api', {name : req.query.search},

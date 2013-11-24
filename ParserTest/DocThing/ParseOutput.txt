@@ -1,1 +1,35 @@
-[{"name":"stuff","type":"function","description":"This function takes x and y and does crazy stuff with them.","return":"int","children":[],"attr":["description","return"],"path":"DocThing"},{"arguments":"int x, int y","name":"do","description":"This is a very bad description right?","return":"[]","blah":"working?","children":[],"attr":["arguments","description","return","blah"],"path":"DocThing"},{" thing":"test","name":"act","description":"Takes an Actor through its routine.","arguments":"Actor a","type":"function","children":[],"attr":[" thing","description","arguments"],"path":"DocThing"},{"type":"folder","name":"DocThing","path":"","children":["stuff","do","act"]}]
+[
+	{
+		"name":"stuff",
+		"type":"function",
+		"description":"This function takes x and y and does crazy stuff with them.",
+		"return":"int","children":[],
+		"attr":["description","return"],
+		"path":"DocThing"
+	},
+	{
+		"arguments":"int x, int y",
+		"name":"do",
+		"description":"This is a very bad description right?",
+		"return":"[]",
+		"blah":"working?",
+		"children":[],
+		"attr":["arguments","description","return","blah"],
+		"path":"DocThing",
+		"type" : "args"
+	},
+	{
+		" thing":"test",
+		"name":"act",
+		"description":"Takes an Actor through its routine.",
+		"arguments":"Actor a",
+		"type":"function",
+		"children":[],
+		"attr":[" thing","description","arguments"],
+		"path":"DocThing"},
+	{
+		"type":"folder",
+		"name":"DocThing",
+		"path":"",
+		"children":["stuff","do","act"]}
+]

@@ -28,12 +28,12 @@ function initNavMenu() {
 // Given the id of a tree DOM element, get the absolute path to the
 // corresponding APIElem.
 function pathFromId(id) {
-	return id.substring(menuId.length, id.length);
+	return id.substring(menuId.length, id.length).replace(/(\\)/g,"").replace(/(\.)/g,"/");
 }
 
 // Given an absolute path, returns the corresponding tree DOM id.
 function idFromPath(path) {
-	return menuId + path;
+	return menuId + path.replace( /(\/)/g,".");
 }
 
 /* @Doc
@@ -58,7 +58,7 @@ function expand(parentPath, isRoot) {
 	});
 
 	req.done(function(data) {
-		var parentNode = $("#" + idFromPath(parentPath));
+		var parentNode = $("#" + idFromPath(parentPath).replace( /(:|\.|\[|\])/g, "\\$1" ));
 		var childNodes = $("<ul>");
 		var children = data.children;
 		for (var i = 0; i < children.length; i++) {
@@ -77,7 +77,7 @@ function expand(parentPath, isRoot) {
 // Remove the branch below the nav menu branch corresponding to the given path.
 function collapse(path) {
 	console.log("Collapsing path: " + path);
-	var node = $("#" + idFromPath(path));
+	var node = $("#" + idFromPath(path).replace( /(:|\.|\[|\])/g, "\\$1" ));
 	console.log(node);
 	node.children().remove("ul");
 }
