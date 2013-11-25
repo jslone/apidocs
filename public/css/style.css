@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:400,800");
+html,body{height:100%}
 body{font-family:'Arial';background-color:#fff;color:#000;margin:0}
 a:link,a:visited,a:hover,a:active{color:inherit;text-decoration:none}
 #header{font-family:'Open Sans';width:100%;background-color:#000;color:#fff;overflow:hidden}
