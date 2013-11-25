@@ -1,0 +1,4 @@
+[2013-11-23_18:19]	Use of a reserved keyword is being skipped at line 27 in file /home/tim/Dropbox/CMU/F13/15221/apidocs/ParserTest/DocThing/DocThing.java
+[2013-11-23_18:19]	Use of a reserved keyword is being skipped at line 32 in file /home/tim/Dropbox/CMU/F13/15221/apidocs/ParserTest/DocThing/DocThing.java
+[2013-11-23_18:19]	Comment block at line 35 in /home/tim/Dropbox/CMU/F13/15221/apidocs/ParserTest/DocThing/DocThing.java is missing an essential property
+[2013-11-23_18:19]	Parsing of /home/tim/Dropbox/CMU/F13/15221/apidocs/ParserTest/DocThing completed

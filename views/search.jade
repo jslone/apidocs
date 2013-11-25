@@ -1,0 +1,5 @@
+extend layout
+block content
+	.unit
+		each api in results
+			a(href='/api/#{api.fullName}') #{api.fullName}
