@@ -18,6 +18,7 @@ html
 							input(type='email' placeholder='email' name='username')
 							input(type='password' placeholder='password' name='password')
 							input(type='submit' value='Log In')
+							a(href='/login' style='float') New User?
 					else
 						form(action='/logout' method='get')
 							label #{user.username}

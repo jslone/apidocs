@@ -1,5 +1,8 @@
 extend layout
 block content
 	.unit
-		each api in results
-			a(href='/api/#{api.fullName}') #{api.fullName}
+		h1 Results
+		p
+			each api in results
+				a(href='/api/#{api.fullName}') #{api.fullName}
+				br

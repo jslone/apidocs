@@ -132,8 +132,9 @@ function start() {
 			db.get('users',{username : req.body.username},
 				function(err,results) {
 					if(results.length > 0) {
-						res.writeHead(403,"Forbidden",{'Content-Type' : 'text/plain'});
-						res.end();
+						res.status(403);
+						res.render('msg', {title : 'APIDocs - Account', user : req.user,
+												status : '403', message : 'An account with that username already exists.'});
 					}
 					else {
 						var user = new Object();
@@ -142,12 +143,14 @@ function start() {
 						db.put('users',user,
 							function (err) {
 								if(err) {
-									res.writeHead(500,"Internal Server Error",{'Content-Type' : 'text/plain'});
-									res.end(err);
+									res.status(500);
+									res.render('msg', {title : 'APIDocs - Account', user : req.user,
+														status : '500', message : 'The server experienced an error creating your account.'});
 								}
 								else {
-									res.writeHead(201,"Created",{'Content-Type' : 'text/plain'});
-									res.end();
+									res.status(201);
+									res.render('msg', {title : 'APIDocs - Account', user : req.user,
+														status : '201', message : 'Account created successfully!'});
 								}
 							});
 					}
@@ -171,8 +174,8 @@ function start() {
 		//404
 		else {
 			res.status(404);
-			res.render('404',
-				{title : 'APIDocs - 404', user : req.user});
+			res.render('msg',
+				{title : 'APIDocs - 404', user : req.user, status : '404', message : 'API not found.'});
 		}
 	}
 
@@ -392,7 +395,8 @@ function start() {
 	//search for apis with matching name
 	app.get('/search',
 		function(req,res) {
-			db.get('api', {name : req.query.search},
+			console.log(req.query.search);
+			db.get('api', {name : {$regex : ".*" + req.query.search + ".*", $options : 'i'}},
 				function(err,results) {
 					console.log(results);
 					res.render('search',
@@ -406,8 +410,8 @@ function start() {
 	app.all('*',
 		function(req, res, next){
 			res.status(404);
-			res.render('404',
-				{title : 'APIDocs - 404', user : req.user});
+			res.render('msg',
+				{title : 'APIDocs - 404', user : req.user, status : '404', message : 'Page not found.'});
 		});
 	
 	//start the web server
