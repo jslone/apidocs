@@ -3,9 +3,9 @@ block content
 	.breadcrumbs
 		p
 			- var tok = api.fullName.split('/');
-			- var url = '/api/';
+			- var url = '/api';
 			- for(var i = 0; i < tok.length; i++) {
-			- 	url += tok[i];
+			- 	url += '/' + tok[i];
 			!= '/<a href="' + url + '">' + tok[i] + '</a>'
 			- }
 	.unit
